@@ -201,11 +201,9 @@ function renderPanel() {
   actualizarModoUI(pres);
 
   // Precargar dosis estándar y calcular automáticamente
-  const dosisStd = pres.dosisMin; // dosis mínima recomendada como valor inicial
+  const dosisStd = pres.dosisMin;
   const inputVal = document.getElementById("valor-input");
   if (dosisStd !== undefined && dosisStd !== null && dosisStd > 0) {
-    inputVal.value = dosisStd.toString().replace(".", ",");
-    // Forzar valor numérico correcto en el input
     inputVal.value = dosisStd;
     setTimeout(() => calcular(), 0);
   } else {

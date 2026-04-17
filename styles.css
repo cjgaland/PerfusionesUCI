@@ -367,26 +367,26 @@ body {
 }
 .empty-sub { font-size: 13px; }
 
-/* Overlay */
+/* Overlay — siempre fixed para no bloquear la sidebar */
 #panel-overlay {
   display: none;
-  position: absolute;
+  position: fixed;
   inset: 0;
   background: rgba(0,0,0,0.3);
-  z-index: 10;
+  z-index: 50;
 }
 #panel-overlay.visible { display: block; }
 
-/* Panel derecho deslizante */
+/* Panel derecho deslizante — fixed para estar sobre todo */
 #panel-detalle {
-  position: absolute;
+  position: fixed;
   top: 0; right: 0; bottom: 0;
   width: var(--panel-w);
   background: var(--bg-2);
   border-left: 1px solid var(--border);
   transform: translateX(100%);
   transition: transform 0.3s cubic-bezier(.4,0,.2,1);
-  z-index: 20;
+  z-index: 60;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -734,73 +734,79 @@ body {
 
 /* ── Responsive — Tablet (≤ 900px) ─────────────────────── */
 @media (max-width: 900px) {
-  :root { --panel-w: 380px; }
-
-  .app-content {
-    grid-template-columns: 260px 1fr;
-  }
+  :root { --panel-w: 360px; }
   .header-subtitle { display: none; }
+  .app-content { grid-template-columns: 240px 1fr; }
 }
 
 /* ── Responsive — Móvil (≤ 640px) ──────────────────────── */
 @media (max-width: 640px) {
-  /* Header compacto en 2 filas */
+  :root { --panel-w: 100%; }
+
+  /* Header compacto */
   .app-header {
     height: auto;
-    padding: 10px 14px;
+    padding: 10px 12px;
     gap: 8px;
     flex-wrap: wrap;
   }
-  .header-brand { flex: 1; }
+  .header-brand { flex: 1; min-width: 0; }
   .header-logo  { width: 30px; height: 30px; font-size: 15px; }
   .header-title { font-size: 13px; }
-  .btn-tema     { width: 32px; height: 32px; font-size: 16px; }
-
+  .header-subtitle { display: none; }
+  .btn-tema { width: 32px; height: 32px; font-size: 16px; }
   .peso-widget {
     width: 100%;
     justify-content: space-between;
     padding: 6px 12px;
-    border-radius: 8px;
   }
-  .peso-label { font-size: 11px; }
 
-  /* Layout: lista arriba, panel cubre todo */
+  /* Layout: columna única */
   .app-content {
-    display: flex;
-    flex-direction: column;
-    height: calc(100vh - 90px); /* ajusta según header */
-    overflow: hidden;
+    grid-template-columns: 1fr;
+    height: auto;
+    min-height: calc(100vh - 90px);
+    overflow: visible;
   }
 
-  /* Sidebar: franja horizontal compacta */
+  /* Sidebar compacta */
   .sidebar {
-    flex-shrink: 0;
     border-right: none;
     border-bottom: 1px solid var(--border);
-    max-height: 220px;
+    height: auto;
   }
   .sidebar-top { padding: 10px 12px; gap: 8px; }
-  #filtros { gap: 4px; overflow-x: auto; flex-wrap: nowrap; padding-bottom: 2px; }
-  .chip    { white-space: nowrap; flex-shrink: 0; }
 
+  /* Chips en fila horizontal con scroll */
+  #filtros {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 2px;
+    gap: 4px;
+    -webkit-overflow-scrolling: touch;
+  }
+  .chip { white-space: nowrap; flex-shrink: 0; }
+
+  /* Lista horizontal scrollable */
   #lista-farmacos {
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
     overflow-x: auto;
     overflow-y: hidden;
-    padding: 6px 8px;
-    gap: 6px;
-    scrollbar-width: thin;
+    padding: 8px 10px;
+    gap: 8px;
+    max-height: none;
+    -webkit-overflow-scrolling: touch;
   }
   .farm-card {
     flex-direction: column;
     flex-shrink: 0;
-    width: 110px;
+    width: 100px;
     min-height: 80px;
     align-items: center;
     text-align: center;
-    padding: 10px 8px;
+    padding: 10px 6px;
     gap: 4px;
     margin-bottom: 0;
   }
@@ -809,59 +815,51 @@ body {
   .farm-cat    { display: none; }
   .farm-pres-n { font-size: 9px; }
 
-  /* Área principal ocupa el resto */
-  .main-area { flex: 1; overflow: hidden; }
+  /* Área principal */
+  .main-area { min-height: 200px; }
+  .empty-state { padding: 30px 20px; gap: 10px; }
+  .empty-icono { font-size: 36px; }
+  .empty-title { font-size: 14px; }
+  .empty-sub   { font-size: 12px; text-align: center; }
 
-  /* Panel: pantalla completa con scroll */
+  /* Panel: desliza desde abajo, cubre toda la pantalla */
   #panel-detalle {
-    position: fixed;
-    inset: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
     width: 100%;
-    height: 100%;
-    transform: translateY(100%);
-    transition: transform 0.3s cubic-bezier(.4,0,.2,1);
     border-left: none;
-    border-top: 1px solid var(--border);
+    border-top: 2px solid var(--cyan);
+    transform: translateY(100%);
     overflow-y: auto;
-    display: flex;
-    flex-direction: column;
   }
   #panel-detalle.abierto { transform: translateY(0); }
 
-  #panel-overlay { position: fixed; }
+  .panel-header { padding: 14px 14px 10px; }
+  .panel-farm-titulo { font-size: 15px; }
+  .panel-body { padding: 12px 14px; gap: 12px; }
 
-  .panel-header { padding: 16px 16px 12px; }
-  .panel-farm-titulo { font-size: 16px; }
-  .panel-body { padding: 12px 16px; gap: 12px; flex: none; }
-
-  /* Info grid a 1 columna en móvil muy pequeño */
-  .info-grid { grid-template-columns: 1fr 1fr; gap: 5px; }
-  .info-item { padding: 8px 10px; }
-  .info-val  { font-size: 13px; }
-
-  /* Botón calcular más grande (táctil) */
+  /* Botones táctiles grandes */
   .btn-calcular { padding: 15px; font-size: 15px; }
   .btn-limpiar  { padding: 15px 14px; }
 
-  /* Resultado: apilar en móvil */
-  .res-principal { flex-direction: column; }
-  .res-divider   { width: 100%; height: 1px; }
-  .res-item      { padding: 14px 16px; }
-  .res-item--grande .res-valor { font-size: 36px; }
-
-  .res-extras { flex-wrap: wrap; }
-  .res-extra-item { min-width: 33%; border-right: none; border-top: 1px solid var(--border); }
-
-  /* Empty state más compacto */
-  .empty-state { gap: 10px; }
-  .empty-icono { font-size: 40px; }
-  .empty-title { font-size: 15px; }
-  .empty-sub   { font-size: 12px; text-align: center; padding: 0 20px; }
+  /* Resultado apilado */
+  .res-principal  { flex-direction: column; }
+  .res-divider    { width: 100%; height: 1px; }
+  .res-item       { padding: 12px; }
+  .res-item--grande .res-valor { font-size: 34px; }
+  .res-extras     { flex-wrap: wrap; }
+  .res-extra-item {
+    min-width: 33%;
+    border-right: none;
+    border-top: 1px solid var(--border);
+  }
 }
 
-/* ── Móvil muy pequeño (≤ 380px) ──────────────────────── */
-@media (max-width: 380px) {
-  .farm-card  { width: 95px; }
-  .info-grid  { grid-template-columns: 1fr; }
+/* ── Móvil muy pequeño (≤ 360px) ──────────────────────── */
+@media (max-width: 360px) {
+  .farm-card { width: 85px; }
+  .info-grid { grid-template-columns: 1fr; }
   .info-item--full { grid-column: 1; }
 }
