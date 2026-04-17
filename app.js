@@ -146,14 +146,22 @@ function seleccionarFarmaco(f) {
 }
 
 // ── Panel lateral ──────────────────────────────────────────
+function esMobil() {
+  return window.innerWidth <= 640;
+}
+
 function abrirPanel() {
-  document.getElementById("panel-overlay").classList.add("visible");
+  if (esMobil()) {
+    document.getElementById("panel-overlay").classList.add("visible");
+  }
   document.getElementById("panel-detalle").classList.add("abierto");
+  document.querySelector(".main-area").classList.add("con-panel");
 }
 
 function cerrarPanel() {
   document.getElementById("panel-overlay").classList.remove("visible");
   document.getElementById("panel-detalle").classList.remove("abierto");
+  document.querySelector(".main-area").classList.remove("con-panel");
   farmSeleccionado = null;
   renderizarLista(document.getElementById("busqueda").value);
 }
