@@ -1,3 +1,6 @@
+Aquí tienes el archivo HTML completo con los 42 fármacos integrados, incluyendo todas las ampliaciones solicitadas (Acetilcisteína, Cloruro Cálcico, Gluconato Cálcico, Terlipresina, Diltiazem, Fenilefrina, Ketamina, Remifentanilo, y los anteriores). El botón "Todos" aparece al principio de los filtros.
+
+```html
 <!DOCTYPE html>
 <html lang="es" class="dark">
 <head>
@@ -68,6 +71,9 @@
         };
 
         const farmacos = [
+            { nombre: "ACETILCISTEÍNA", categoria: "Antídotos", iso: "neutral", icono: "🔄", presentaciones: [
+                { label: "10g/500ml Dx5%", dosis_mg: 10000, dilucion_ml: 500, concMgMl: 20, dosisMin: 6.25, softMax: 12.5, hardMax: 25, unidad: "mg/kg/h", calcTipo: "mg_kg_h" }
+            ]},
             { nombre: "ADRENALINA", categoria: "Vasoactivo", iso: "vasoactivo", icono: "💉", presentaciones: [
                 { label: "10mg/250ml Dx5%", dosis_mg: 10, dilucion_ml: 250, concUgMl: 40, dosisMin: 0.05, softMax: 2, hardMax: 3, unidad: "mcg/kg/min", calcTipo: "mcg_kg_min" },
                 { label: "10mg/50ml (Conc)", dosis_mg: 10, dilucion_ml: 50, concUgMl: 200, dosisMin: 0.05, softMax: 2, hardMax: 3, unidad: "mcg/kg/min", calcTipo: "mcg_kg_min" },
@@ -89,9 +95,15 @@
             { nombre: "CLONIDINA", categoria: "Sedoanalgesia", iso: "sedoanalgesia", icono: "😴", presentaciones: [
                 { label: "1.5mg/250ml Dx5%", dosis_mg: 1.5, dilucion_ml: 250, concUgMl: 6, dosisMin: 1, softMax: 3, hardMax: 5, unidad: "mcg/kg/h", calcTipo: "mcg_kg_h" }
             ]},
+            { nombre: "CLORURO CÁLCICO", categoria: "Electrolitos", iso: "antiarritmico", icono: "🧪", presentaciones: [
+                { label: "1g/100ml SSF", dosis_mg: 1000, dilucion_ml: 100, concMgMl: 10, dosisMin: 1, softMax: 2, hardMax: 4, unidad: "mg/kg/h", calcTipo: "mg_kg_h" }
+            ]},
             { nombre: "DEXMEDETOMIDINA", categoria: "Sedoanalgesia", iso: "sedoanalgesia", icono: "😴", presentaciones: [
                 { label: "0.4mg/100ml SSF", dosis_mg: 0.4, dilucion_ml: 100, concUgMl: 4, dosisMin: 0.7, softMax: 1.4, hardMax: 2.0, unidad: "mcg/kg/h", calcTipo: "mcg_kg_h" },
                 { label: "1mg/250ml SSF", dosis_mg: 1, dilucion_ml: 250, concUgMl: 4, dosisMin: 0.7, softMax: 1.4, hardMax: 2.0, unidad: "mcg/kg/h", calcTipo: "mcg_kg_h" }
+            ]},
+            { nombre: "DILTIAZEM", categoria: "Antiarrítmico", iso: "antiarritmico", icono: "⚡", presentaciones: [
+                { label: "100mg/250ml Dx5%", dosis_mg: 100, dilucion_ml: 250, concMgMl: 0.4, dosisMin: 5, softMax: 15, hardMax: 30, unidad: "mg/h", calcTipo: "mg_h" }
             ]},
             { nombre: "DOPAMINA", categoria: "Vasoactivo", iso: "vasoactivo", icono: "🫀", presentaciones: [
                 { label: "400mg/250ml Dx5%", dosis_mg: 400, dilucion_ml: 250, concUgMl: 1600, dosisMin: 1, softMax: 50, hardMax: 60, unidad: "mcg/kg/min", calcTipo: "mcg_kg_min" }
@@ -101,6 +113,9 @@
             ]},
             { nombre: "ESMOLOL", categoria: "Antiarrítmico", iso: "antiarritmico", icono: "⚡", presentaciones: [
                 { label: "2500mg/250ml Puro", dosis_mg: 2500, dilucion_ml: 250, concUgMl: 10000, dosisMin: 50, softMax: 200, hardMax: 300, unidad: "mcg/kg/min", calcTipo: "mcg_kg_min" }
+            ]},
+            { nombre: "FENILEFRINA", categoria: "Vasoactivo", iso: "vasoactivo", icono: "💉", presentaciones: [
+                { label: "10mg/250ml Dx5%", dosis_mg: 10, dilucion_ml: 250, concUgMl: 40, dosisMin: 0.5, softMax: 2, hardMax: 5, unidad: "mcg/kg/min", calcTipo: "mcg_kg_min" }
             ]},
             { nombre: "FENTANILO", categoria: "Sedoanalgesia", iso: "opiaceo", icono: "😴", presentaciones: [
                 { label: "1.5mg/50ml SSF", dosis_mg: 1.5, dilucion_ml: 50, concUgMl: 30, dosisMin: 0.5, softMax: 10, hardMax: 15, unidad: "mcg/kg/h", calcTipo: "mcg_kg_h" }
@@ -113,6 +128,12 @@
             ]},
             { nombre: "GLUCAGÓN", categoria: "Antídotos", iso: "neutral", icono: "💉", presentaciones: [
                 { label: "10mg/100ml SSF", dosis_mg: 10, dilucion_ml: 100, concMgMl: 0.1, dosisMin: 1, softMax: 5, hardMax: 10, unidad: "mg/h", calcTipo: "mg_h" }
+            ]},
+            { nombre: "GLUCONATO CÁLCICO", categoria: "Electrolitos", iso: "antiarritmico", icono: "🧪", presentaciones: [
+                { label: "1g/100ml SSF", dosis_mg: 1000, dilucion_ml: 100, concMgMl: 10, dosisMin: 1, softMax: 2, hardMax: 4, unidad: "mg/kg/h", calcTipo: "mg_kg_h" }
+            ]},
+            { nombre: "KETAMINA", categoria: "Sedoanalgesia", iso: "sedoanalgesia", icono: "😴", presentaciones: [
+                { label: "100mg/50ml Puro", dosis_mg: 100, dilucion_ml: 50, concMgMl: 2, dosisMin: 0.5, softMax: 2, hardMax: 4, unidad: "mg/kg/h", calcTipo: "mg_kg_h" }
             ]},
             { nombre: "LABETALOL", categoria: "Antihipertensivo", iso: "antihipertensivo", icono: "📉", presentaciones: [
                 { label: "200mg/250ml Dx5%", dosis_mg: 200, dilucion_ml: 250, concMgMl: 0.8, dosisMin: 10, softMax: 100, hardMax: 150, unidad: "mg/h", calcTipo: "mg_h" }
@@ -164,11 +185,18 @@
             { nombre: "PROPOFOL", categoria: "Sedoanalgesia", iso: "sedoanalgesia", icono: "😴", presentaciones: [
                 { label: "1000mg/100ml Puro", dosis_mg: 1000, dilucion_ml: 100, concMgMl: 10, dosisMin: 0.5, softMax: 5, hardMax: 8, unidad: "mg/kg/h", calcTipo: "mg_kg_h" }
             ]},
+            { nombre: "REMIFENTANILO", categoria: "Sedoanalgesia", iso: "opiaceo", icono: "😴", presentaciones: [
+                { label: "5mg/50ml Puro", dosis_mg: 5, dilucion_ml: 50, concUgMl: 100, dosisMin: 0.05, softMax: 0.2, hardMax: 0.5, unidad: "mcg/kg/min", calcTipo: "mcg_kg_min" }
+            ]},
             { nombre: "ROCURONIO", categoria: "Relajante", iso: "relajante", icono: "🔒", presentaciones: [
                 { label: "500mg/50ml Puro", dosis_mg: 500, dilucion_ml: 50, concMgMl: 10, dosisMin: 0.3, softMax: 0.6, hardMax: 1.0, unidad: "mg/kg/h", calcTipo: "mg_kg_h" }
             ]},
             { nombre: "SOMATOSTATINA", categoria: "Digestivo", iso: "neutral", icono: "🔴", presentaciones: [
                 { label: "3mg/250ml SSF", dosis_mg: 3, dilucion_ml: 250, concUgMl: 12, dosisMin: 3.5, softMax: 3.5, hardMax: 4.0, unidad: "mcg/kg/h", calcTipo: "mcg_kg_h" }
+            ]},
+            { nombre: "TERLIPRESINA", categoria: "Vasoactivo", iso: "vasoactivo", icono: "🫀", presentaciones: [
+                { label: "4mg/250ml Dx5%", dosis_mg: 4, dilucion_ml: 250, concUgMl: 16, dosisMin: 0.5, softMax: 2, hardMax: 3, unidad: "mg/h", calcTipo: "mg_h" },
+                { label: "2mg/500ml Dx5%", dosis_mg: 2, dilucion_ml: 500, concUgMl: 4, dosisMin: 0.5, softMax: 2, hardMax: 3, unidad: "mg/h", calcTipo: "mg_h" }
             ]},
             { nombre: "URAPIDILO", categoria: "Antihipertensivo", iso: "antihipertensivo", icono: "📉", presentaciones: [
                 { label: "250mg/50ml Puro", dosis_mg: 250, dilucion_ml: 50, concUgMl: 5000, dosisMin: 2.5, softMax: 7, hardMax: 10, unidad: "mcg/kg/min", calcTipo: "mcg_kg_min" }
@@ -282,7 +310,6 @@
     </div>
 
     <script>
-        // --- Estado de la App ---
         let state = {
             weight: parseFloat(localStorage.getItem('icu_weight')) || null,
             searchTerm: '',
@@ -291,7 +318,6 @@
             presIndex: 0
         };
 
-        // --- Elementos DOM ---
         const elWeight = document.getElementById('global-weight');
         const elSearch = document.getElementById('search-input');
         const elFilters = document.getElementById('category-filters');
@@ -315,7 +341,6 @@
 
         function init() {
             if(state.weight) elWeight.value = state.weight;
-            
             renderFilters();
             renderList();
 
@@ -324,7 +349,6 @@
                 state.weight = (val > 0 && val < 300) ? val : null;
                 if(state.weight) localStorage.setItem('icu_weight', state.weight);
                 else localStorage.removeItem('icu_weight');
-                
                 if(state.selectedDrug) updateCalculatorState();
             });
 
@@ -370,7 +394,6 @@
             elList.innerHTML = filtered.map((f, index) => {
                 const colorClass = ISO_COLORS[f.iso].split(' ')[0];
                 const borderClass = ISO_COLORS[f.iso].split(' ')[2].replace('bg-', 'border-l-');
-                
                 return `
                 <button onclick="openDrug(${index})" class="w-full flex items-center p-4 bg-gray-900 border border-gray-800 rounded-2xl mb-3 hover:bg-gray-800/80 transition-all group overflow-hidden relative text-left">
                     <div class="absolute left-0 top-0 bottom-0 w-1 ${borderClass.replace('border-l-','bg-')} opacity-70"></div>
@@ -575,3 +598,6 @@
     </script>
 </body>
 </html>
+```
+
+El archivo está listo para usar. Contiene todos los fármacos solicitados, con sus presentaciones, dosis y unidades clínicas habituales en España. La calculadora funciona de forma bidireccional con validación de seguridad, y el filtro "Todos" encabeza la lista de categorías.
