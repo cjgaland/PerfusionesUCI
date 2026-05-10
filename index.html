@@ -36,21 +36,64 @@
         }
     </script>
     <style>
+        /* ===== Scroll y táctiles ===== */
         body { -webkit-tap-highlight-color: transparent; overscroll-behavior-y: none; }
         ::-webkit-scrollbar { display: none; }
         * { scrollbar-width: none; }
+
+        /* ===== Animaciones modales ===== */
         .modal-enter { opacity: 0; transform: translateY(20px); }
         .modal-enter-active { opacity: 1; transform: translateY(0); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
         .modal-leave { opacity: 1; transform: translateY(0); }
         .modal-leave-active { opacity: 0; transform: translateY(20px); transition: all 0.2s ease-in; }
+
+        /* ===== Ocultar flechas en inputs numéricos ===== */
         input[type=number]::-webkit-inner-spin-button, 
         input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
         input[type=number] { -moz-appearance: textfield; }
+
+        /* ===== Panel glass (se adapta con variables) ===== */
         .glass-panel {
             background: rgba(17, 24, 39, 0.7);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: background 0.3s, border 0.3s;
+        }
+
+        /* ===== Modo claro ===== */
+        html.light body {
+            background: #f3f4f6; /* gray-100 */
+            color: #111827;
+        }
+        html.light .glass-panel {
+            background: rgba(255, 255, 255, 0.7);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+        html.light .bg-gray-950 { background-color: #f3f4f6; }
+        html.light .bg-gray-900 { background-color: #ffffff; }
+        html.light .bg-gray-800 { background-color: #f9fafb; }
+        html.light .bg-gray-700 { background-color: #e5e7eb; }
+        html.light .text-gray-100 { color: #111827; }
+        html.light .text-gray-200 { color: #1f2937; }
+        html.light .text-gray-300 { color: #374151; }
+        html.light .text-gray-400 { color: #4b5563; }
+        html.light .text-gray-500 { color: #6b7280; }
+        html.light .border-gray-800 { border-color: #e5e7eb; }
+        html.light .border-gray-700 { border-color: #d1d5db; }
+        html.light .placeholder-gray-500::placeholder { color: #9ca3af; }
+        html.light .placeholder-gray-600::placeholder { color: #6b7280; }
+        html.light .placeholder-gray-800::placeholder { color: #4b5563; }
+        html.light .text-cyan-400 { color: #0e7490; }
+        html.light .text-cyan-500\/70 { color: rgba(14, 116, 144, 0.7); }
+        html.light .shadow-inner { box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.05); }
+
+        /* Ajustes específicos para el modal en modo claro */
+        html.light #calculator-modal {
+            background: #f3f4f6;
+        }
+        html.light #modal-color-strip {
+            /* mantiene el color iso, no se modifica */
         }
     </style>
 </head>
@@ -86,9 +129,6 @@
                 { label: "40mg/50ml Puro", dosis_mg: 40, dilucion_ml: 50, concMgMl: 0.8, dosisMin: 0.06, softMax: 0.18, hardMax: 0.3, unidad: "mg/kg/h", calcTipo: "mg_kg_h" },
                 { label: "150mg/50ml Puro", dosis_mg: 150, dilucion_ml: 50, concMgMl: 3, dosisMin: 0.06, softMax: 0.18, hardMax: 0.3, unidad: "mg/kg/h", calcTipo: "mg_kg_h" }
             ]},
-            { nombre: "SUCCINILCOLINA", categoria: "Relajante", iso: "relajante", icono: "⚡", presentaciones: [
-    { label: "500mg/250ml Dx5%", dosis_mg: 500, dilucion_ml: 250, concMgMl: 2, dosisMin: 2, softMax: 10, hardMax: 20, unidad: "mg/min", calcTipo: "mg_min" }
-]}
             { nombre: "CLEVIDIPINO", categoria: "Antihipertensivo", iso: "antihipertensivo", icono: "📉", presentaciones: [
                 { label: "25mg/50ml Puro", dosis_mg: 25, dilucion_ml: 50, concMgMl: 0.5, dosisMin: 1, softMax: 8, hardMax: 32, unidad: "mg/h", calcTipo: "mg_h" }
             ]},
@@ -194,6 +234,9 @@
             { nombre: "SOMATOSTATINA", categoria: "Digestivo", iso: "neutral", icono: "🔴", presentaciones: [
                 { label: "3mg/250ml SSF", dosis_mg: 3, dilucion_ml: 250, concUgMl: 12, dosisMin: 3.5, softMax: 3.5, hardMax: 4.0, unidad: "mcg/kg/h", calcTipo: "mcg_kg_h" }
             ]},
+            { nombre: "SUCCINILCOLINA", categoria: "Relajante", iso: "relajante", icono: "⚡", presentaciones: [
+                { label: "500mg/250ml Dx5%", dosis_mg: 500, dilucion_ml: 250, concMgMl: 2, dosisMin: 2, softMax: 10, hardMax: 20, unidad: "mg/min", calcTipo: "mg_min" }
+            ]},
             { nombre: "TERLIPRESINA", categoria: "Vasoactivo", iso: "vasoactivo", icono: "🫀", presentaciones: [
                 { label: "4mg/250ml Dx5%", dosis_mg: 4, dilucion_ml: 250, concUgMl: 16, dosisMin: 0.5, softMax: 2, hardMax: 3, unidad: "mg/h", calcTipo: "mg_h" },
                 { label: "2mg/500ml Dx5%", dosis_mg: 2, dilucion_ml: 500, concUgMl: 4, dosisMin: 0.5, softMax: 2, hardMax: 3, unidad: "mg/h", calcTipo: "mg_h" }
@@ -218,13 +261,29 @@
                 <p class="text-xs text-gray-400 font-medium">Cálculo Clínico Avanzado</p>
             </div>
         </div>
-        <div class="flex items-center bg-gray-900/80 border border-gray-800 rounded-2xl p-1 w-full sm:w-auto">
-            <div class="pl-3 pr-2 text-gray-400 font-medium text-sm flex items-center gap-1">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"></path></svg>
-                Peso:
+
+        <div class="flex items-center gap-3">
+            <!-- Toggle día/noche -->
+            <button id="theme-toggle" class="p-2 rounded-full bg-gray-800 text-gray-400 hover:text-yellow-400 hover:bg-gray-700 transition-colors" title="Cambiar modo claro/oscuro">
+                <!-- Icono sol (modo claro) -->
+                <svg id="sun-icon" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                </svg>
+                <!-- Icono luna (modo oscuro) -->
+                <svg id="moon-icon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+                </svg>
+            </button>
+
+            <!-- Peso -->
+            <div class="flex items-center bg-gray-900/80 border border-gray-800 rounded-2xl p-1">
+                <div class="pl-3 pr-2 text-gray-400 font-medium text-sm flex items-center gap-1">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"></path></svg>
+                    Peso:
+                </div>
+                <input type="number" id="global-weight" placeholder="00.0" class="w-20 bg-transparent text-white font-mono text-xl font-bold text-center focus:outline-none placeholder-gray-600">
+                <div class="pr-4 text-gray-500 font-medium text-sm">kg</div>
             </div>
-            <input type="number" id="global-weight" placeholder="00.0" class="w-20 bg-transparent text-white font-mono text-xl font-bold text-center focus:outline-none placeholder-gray-600">
-            <div class="pr-4 text-gray-500 font-medium text-sm">kg</div>
         </div>
     </header>
 
@@ -310,6 +369,7 @@
     </div>
 
     <script>
+        // --- Estado de la App ---
         let state = {
             weight: parseFloat(localStorage.getItem('icu_weight')) || null,
             searchTerm: '',
@@ -318,6 +378,40 @@
             presIndex: 0
         };
 
+        // --- Tema claro/oscuro ---
+        function applyTheme() {
+            const isDark = localStorage.getItem('theme') === 'dark' || !localStorage.getItem('theme');
+            const html = document.documentElement;
+            if (isDark) {
+                html.classList.add('dark');
+                html.classList.remove('light');
+            } else {
+                html.classList.add('light');
+                html.classList.remove('dark');
+            }
+            updateThemeIcons(isDark);
+        }
+
+        function toggleTheme() {
+            const isDark = localStorage.getItem('theme') === 'dark' || !localStorage.getItem('theme');
+            const newTheme = isDark ? 'light' : 'dark';
+            localStorage.setItem('theme', newTheme);
+            applyTheme();
+        }
+
+        function updateThemeIcons(isDark) {
+            const sunIcon = document.getElementById('sun-icon');
+            const moonIcon = document.getElementById('moon-icon');
+            if (isDark) {
+                sunIcon.classList.add('hidden');
+                moonIcon.classList.remove('hidden');
+            } else {
+                sunIcon.classList.remove('hidden');
+                moonIcon.classList.add('hidden');
+            }
+        }
+
+        // --- Elementos DOM ---
         const elWeight = document.getElementById('global-weight');
         const elSearch = document.getElementById('search-input');
         const elFilters = document.getElementById('category-filters');
@@ -339,10 +433,15 @@
         const safetyBar = document.getElementById('safety-bar');
         const safetyMsg = document.getElementById('safety-message');
 
+        // --- Inicialización ---
         function init() {
+            applyTheme();
             if(state.weight) elWeight.value = state.weight;
+            
             renderFilters();
             renderList();
+
+            document.getElementById('theme-toggle').addEventListener('click', toggleTheme);
 
             elWeight.addEventListener('input', (e) => {
                 const val = parseFloat(e.target.value);
@@ -407,6 +506,7 @@
             `}).join('');
         }
 
+        // --- Lógica Modal y Calculadora ---
         function openDrug(index) {
             const displayedDrugs = farmacos.filter(f => {
                 const matchCat = state.category === 'Todos' || f.categoria === state.category;
@@ -510,6 +610,7 @@
             }
         }
 
+        // --- Cálculos ---
         function calculate(source) {
             const pres = state.selectedDrug.presentaciones[state.presIndex];
             const w = state.weight || 1;
@@ -594,6 +695,7 @@
             }
         }
 
+        // Arranque
         init();
     </script>
 </body>
