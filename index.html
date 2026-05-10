@@ -61,9 +61,16 @@
             transition: background 0.3s, border 0.3s;
         }
 
+        /* ===== Toast animado ===== */
+        .toast-float {
+            animation: toastIn 0.3s ease-out, toastOut 0.3s 2.7s ease-in forwards;
+        }
+        @keyframes toastIn { from { opacity:0; transform: translateY(10px); } to { opacity:1; transform: translateY(0); } }
+        @keyframes toastOut { from { opacity:1; transform: translateY(0); } to { opacity:0; transform: translateY(10px); } }
+
         /* ===== Modo claro ===== */
         html.light body {
-            background: #f3f4f6; /* gray-100 */
+            background: #f3f4f6;
             color: #111827;
         }
         html.light .glass-panel {
@@ -87,17 +94,26 @@
         html.light .text-cyan-400 { color: #0e7490; }
         html.light .text-cyan-500\/70 { color: rgba(14, 116, 144, 0.7); }
         html.light .shadow-inner { box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.05); }
-
-        /* Ajustes específicos para el modal en modo claro */
-        html.light #calculator-modal {
-            background: #f3f4f6;
-        }
-        html.light #modal-color-strip {
-            /* mantiene el color iso, no se modifica */
-        }
+        html.light #calculator-modal .bg-gray-900 { background-color: #ffffff; }
+        html.light #calculator-modal .bg-gray-900\/50 { background-color: rgba(249, 250, 251, 0.8); }
+        html.light #calculator-modal .text-white { color: #111827; }
+        html.light #calculator-modal .text-gray-200 { color: #1f2937; }
+        html.light #calculator-modal .border-gray-800 { border-color: #e5e7eb; }
+        html.light #calculator-modal .bg-gray-800 { background-color: #f3f4f6; }
+        html.light #calculator-modal .bg-gray-900\/80 { background-color: #f9fafb; }
+        html.light #calculator-modal .bg-gray-800\/80 { background-color: rgba(243, 244, 246, 0.8); }
+        html.light #modal-title { color: #111827; }
     </style>
 </head>
 <body class="bg-gray-950 text-gray-100 h-screen w-screen overflow-hidden flex flex-col font-sans selection:bg-blue-500/30">
+
+    <!-- Toast container -->
+    <div id="toast-container" class="fixed top-4 right-4 z-[60] flex flex-col gap-2 pointer-events-none"></div>
+
+    <!-- Peso warning sutil -->
+    <div id="global-weight-warning" class="hidden bg-yellow-500/20 border-b border-yellow-500/30 px-4 py-2 text-center text-xs text-yellow-400 font-medium cursor-pointer" onclick="document.getElementById('global-weight').focus()">
+        ⚠️ Introduce el peso del paciente para habilitar todos los cálculos
+    </div>
 
     <script>
         const ISO_COLORS = {
@@ -262,14 +278,20 @@
             </div>
         </div>
 
-        <div class="flex items-center gap-3">
+        <div class="flex items-center gap-2 flex-wrap justify-end">
+            <!-- Favoritos rápidos -->
+            <div id="quick-favorites" class="flex gap-1 overflow-x-auto max-w-[180px] sm:max-w-xs"></div>
+
+            <!-- Bloqueo de orientación -->
+            <button id="lock-orientation-btn" class="p-2 rounded-full bg-gray-800 text-gray-400 hover:text-blue-400 hover:bg-gray-700 transition-colors" title="Bloquear orientación vertical">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+            </button>
+
             <!-- Toggle día/noche -->
             <button id="theme-toggle" class="p-2 rounded-full bg-gray-800 text-gray-400 hover:text-yellow-400 hover:bg-gray-700 transition-colors" title="Cambiar modo claro/oscuro">
-                <!-- Icono sol (modo claro) -->
                 <svg id="sun-icon" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
                 </svg>
-                <!-- Icono luna (modo oscuro) -->
                 <svg id="moon-icon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
                 </svg>
@@ -281,7 +303,7 @@
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"></path></svg>
                     Peso:
                 </div>
-                <input type="number" id="global-weight" placeholder="00.0" class="w-20 bg-transparent text-white font-mono text-xl font-bold text-center focus:outline-none placeholder-gray-600">
+                <input type="number" id="global-weight" placeholder="00.0" inputmode="decimal" class="w-20 bg-transparent text-white font-mono text-xl font-bold text-center focus:outline-none placeholder-gray-600">
                 <div class="pr-4 text-gray-500 font-medium text-sm">kg</div>
             </div>
         </div>
@@ -314,7 +336,7 @@
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
             </button>
         </div>
-        <div class="flex-1 overflow-y-auto p-5 flex flex-col gap-6 relative">
+        <div class="flex-1 overflow-y-auto p-5 flex flex-col gap-6 relative" id="modal-scroll-area">
             <div class="flex overflow-x-auto gap-2 pb-1" id="presentation-tabs"></div>
             <div id="weight-warning" class="hidden bg-orange-500/10 border border-orange-500/30 rounded-xl p-4 flex items-start gap-3">
                 <svg class="w-6 h-6 text-orange-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
@@ -335,7 +357,7 @@
                     <div class="flex-1 w-full bg-gray-900 border border-gray-700 rounded-2xl p-4 transition-colors focus-within:border-blue-500 focus-within:ring-1 focus-within:ring-blue-500 relative overflow-hidden group">
                         <div class="text-xs text-gray-400 font-semibold mb-2 uppercase tracking-wide">Dosis Objetivo</div>
                         <div class="flex items-baseline">
-                            <input type="number" id="input-dosis" class="w-full bg-transparent text-white font-mono text-4xl sm:text-5xl font-bold focus:outline-none placeholder-gray-800" placeholder="0.0">
+                            <input type="number" id="input-dosis" inputmode="decimal" class="w-full bg-transparent text-white font-mono text-4xl sm:text-5xl font-bold focus:outline-none placeholder-gray-800" placeholder="0.0">
                             <span id="unit-dosis" class="text-gray-500 font-mono text-sm ml-2 shrink-0">mcg/kg/min</span>
                         </div>
                         <div class="absolute bottom-0 left-0 w-full h-1 bg-gray-800">
@@ -346,14 +368,22 @@
                         <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg>
                     </div>
                     <div class="flex-1 w-full bg-gray-900 border border-gray-700 rounded-2xl p-4 transition-colors focus-within:border-cyan-500 focus-within:ring-1 focus-within:ring-cyan-500">
-                        <div class="text-xs text-cyan-500/70 font-semibold mb-2 uppercase tracking-wide">Ritmo de Bomba</div>
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-xs text-cyan-500/70 font-semibold uppercase tracking-wide">Ritmo de Bomba</span>
+                            <button id="copy-btn" class="p-1 rounded-lg text-gray-500 hover:text-cyan-400 hover:bg-gray-800 transition-colors" title="Copiar ritmo">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                            </button>
+                        </div>
                         <div class="flex items-baseline">
-                            <input type="number" id="input-ritmo" class="w-full bg-transparent text-cyan-400 font-mono text-4xl sm:text-5xl font-bold focus:outline-none placeholder-gray-800" placeholder="0.0">
+                            <input type="number" id="input-ritmo" inputmode="decimal" class="w-full bg-transparent text-cyan-400 font-mono text-4xl sm:text-5xl font-bold focus:outline-none placeholder-gray-800" placeholder="0.0">
                             <span class="text-gray-500 font-mono text-sm ml-2 shrink-0">ml/h</span>
                         </div>
                     </div>
                 </div>
                 <div id="safety-message" class="text-center text-sm font-medium h-6 mt-1 transition-colors"></div>
+                <div class="text-center text-xs text-gray-500 font-mono">
+                    Progreso rango: <span id="safety-percent" class="text-gray-400 font-bold">--</span>
+                </div>
                 <div class="mt-6 grid grid-cols-2 gap-3">
                     <div class="bg-gray-900/50 rounded-xl p-3 border border-gray-800/50">
                         <div class="text-[10px] uppercase text-gray-500 font-bold tracking-wider mb-1">Concentración</div>
@@ -369,18 +399,38 @@
     </div>
 
     <script>
-        // --- Estado de la App ---
+        // --- Estado ---
         let state = {
             weight: parseFloat(localStorage.getItem('icu_weight')) || null,
             searchTerm: '',
             category: 'Todos',
             selectedDrug: null,
-            presIndex: 0
+            presIndex: 0,
+            favorites: JSON.parse(localStorage.getItem('favorites') || '[]')
         };
 
-        // --- Tema claro/oscuro ---
-        function applyTheme() {
-            const isDark = localStorage.getItem('theme') === 'dark' || !localStorage.getItem('theme');
+        // --- Tema con horario automático ---
+        function getHourBasedTheme() {
+            const hour = new Date().getHours();
+            return (hour >= 7 && hour < 19) ? 'light' : 'dark';
+        }
+
+        function applyTheme(override = null) {
+            let theme;
+            if (override) {
+                theme = override;
+                localStorage.setItem('theme_manual', override);
+                localStorage.setItem('theme_auto_override', 'true');
+            } else {
+                const manualOverride = localStorage.getItem('theme_auto_override') === 'true';
+                if (manualOverride) {
+                    theme = localStorage.getItem('theme_manual') || getHourBasedTheme();
+                } else {
+                    theme = getHourBasedTheme();
+                }
+            }
+
+            const isDark = theme === 'dark';
             const html = document.documentElement;
             if (isDark) {
                 html.classList.add('dark');
@@ -393,30 +443,30 @@
         }
 
         function toggleTheme() {
-            const isDark = localStorage.getItem('theme') === 'dark' || !localStorage.getItem('theme');
-            const newTheme = isDark ? 'light' : 'dark';
-            localStorage.setItem('theme', newTheme);
-            applyTheme();
+            const isDark = document.documentElement.classList.contains('dark');
+            applyTheme(isDark ? 'light' : 'dark');
         }
 
         function updateThemeIcons(isDark) {
             const sunIcon = document.getElementById('sun-icon');
             const moonIcon = document.getElementById('moon-icon');
             if (isDark) {
-                sunIcon.classList.add('hidden');
-                moonIcon.classList.remove('hidden');
+                sunIcon?.classList.add('hidden');
+                moonIcon?.classList.remove('hidden');
             } else {
-                sunIcon.classList.remove('hidden');
-                moonIcon.classList.add('hidden');
+                sunIcon?.classList.remove('hidden');
+                moonIcon?.classList.add('hidden');
             }
         }
 
-        // --- Elementos DOM ---
+        // --- Dimensiones del DOM ---
         const elWeight = document.getElementById('global-weight');
         const elSearch = document.getElementById('search-input');
         const elFilters = document.getElementById('category-filters');
         const elList = document.getElementById('drug-list');
         const elModal = document.getElementById('calculator-modal');
+        const elWarningGlobal = document.getElementById('global-weight-warning');
+        const elQuickFavs = document.getElementById('quick-favorites');
         
         const mTitle = document.getElementById('modal-title');
         const mIcon = document.getElementById('modal-icon');
@@ -429,9 +479,121 @@
         const uDosis = document.getElementById('unit-dosis');
         const calcCore = document.getElementById('calculator-core');
         const weightWarn = document.getElementById('weight-warning');
+        const copyBtn = document.getElementById('copy-btn');
         
         const safetyBar = document.getElementById('safety-bar');
         const safetyMsg = document.getElementById('safety-message');
+        const safetyPercent = document.getElementById('safety-percent');
+
+        // --- Toast ---
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            const bg = type === 'success' ? 'bg-green-600' : type === 'undo' ? 'bg-yellow-600' : 'bg-gray-700';
+            toast.className = `${bg} text-white px-4 py-2 rounded-xl text-sm font-medium shadow-lg toast-float pointer-events-auto cursor-pointer`;
+            toast.textContent = message;
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        // --- Favoritos ---
+        function renderFavorites() {
+            if (!elQuickFavs) return;
+            const favs = state.favorites.filter(name => farmacos.some(f => f.nombre === name));
+            state.favorites = favs;
+            localStorage.setItem('favorites', JSON.stringify(favs));
+
+            elQuickFavs.innerHTML = favs.map(name => `
+                <button onclick="openDrugByName('${name}')" class="px-2 py-1 bg-gray-800 border border-gray-700 rounded-full text-xs font-medium text-gray-300 hover:bg-gray-700 transition-colors whitespace-nowrap">
+                    ⭐ ${name.length > 12 ? name.substring(0, 11) + '…' : name}
+                </button>
+            `).join('');
+        }
+
+        function toggleFavorite(drugName) {
+            const idx = state.favorites.indexOf(drugName);
+            if (idx >= 0) {
+                state.favorites.splice(idx, 1);
+                showToast(`Quitado de favoritos: ${drugName}`, 'undo');
+            } else {
+                if (state.favorites.length >= 5) state.favorites.shift();
+                state.favorites.push(drugName);
+                showToast(`Añadido a favoritos: ${drugName}`, 'success');
+            }
+            localStorage.setItem('favorites', JSON.stringify(state.favorites));
+            renderFavorites();
+            if (state.selectedDrug) updateFavoriteStar();
+        }
+
+        function updateFavoriteStar() {
+            const favStar = document.getElementById('fav-star');
+            if (favStar) {
+                if (state.favorites.includes(state.selectedDrug.nombre)) {
+                    favStar.textContent = '⭐';
+                    favStar.classList.add('text-yellow-400');
+                } else {
+                    favStar.textContent = '☆';
+                    favStar.classList.remove('text-yellow-400');
+                }
+            }
+        }
+
+        function openDrugByName(name) {
+            const idx = farmacos.findIndex(f => f.nombre === name);
+            if (idx >= 0) {
+                state.category = 'Todos';
+                state.searchTerm = '';
+                elSearch.value = '';
+                renderFilters();
+                renderList();
+                // esperamos un tick para que la lista se actualice
+                setTimeout(() => openDrug(idx), 100);
+            }
+        }
+
+        // --- Mejora: swipe to close modal ---
+        function setupSwipeToClose() {
+            const modalArea = document.getElementById('modal-scroll-area');
+            let startY = 0;
+            modalArea.addEventListener('touchstart', (e) => {
+                startY = e.touches[0].clientY;
+            }, {passive: true});
+            modalArea.addEventListener('touchend', (e) => {
+                const endY = e.changedTouches[0].clientY;
+                if (endY - startY > 60 && modalArea.scrollTop <= 0) {
+                    closeModal();
+                }
+            }, {passive: true});
+        }
+
+        // --- Copiar al portapapeles ---
+        copyBtn.addEventListener('click', () => {
+            const ritmo = iRitmo.value;
+            if (!ritmo) return;
+            navigator.clipboard.writeText(`${ritmo} ml/h`).then(() => {
+                showToast('Copiado: ' + ritmo + ' ml/h', 'success');
+            }).catch(() => showToast('Error al copiar', 'info'));
+        });
+
+        // --- Bloqueo de orientación ---
+        document.getElementById('lock-orientation-btn').addEventListener('click', () => {
+            if (screen.orientation && screen.orientation.lock) {
+                screen.orientation.lock('portrait').then(() => {
+                    showToast('Orientación bloqueada en vertical', 'success');
+                }).catch(() => {
+                    showToast('No se pudo bloquear orientación', 'info');
+                });
+            } else {
+                showToast('Función no soportada en este navegador', 'info');
+            }
+        });
+
+        // --- Inputmode decimal e ingreso rápido ---
+        function fixInputs() {
+            [iDosis, iRitmo, elWeight].forEach(input => {
+                input.setAttribute('inputmode', 'decimal');
+            });
+        }
 
         // --- Inicialización ---
         function init() {
@@ -440,15 +602,23 @@
             
             renderFilters();
             renderList();
+            renderFavorites();
+            fixInputs();
+            setupSwipeToClose();
 
             document.getElementById('theme-toggle').addEventListener('click', toggleTheme);
 
             elWeight.addEventListener('input', (e) => {
                 const val = parseFloat(e.target.value);
                 state.weight = (val > 0 && val < 300) ? val : null;
-                if(state.weight) localStorage.setItem('icu_weight', state.weight);
-                else localStorage.removeItem('icu_weight');
+                if(state.weight) {
+                    localStorage.setItem('icu_weight', state.weight);
+                    elWarningGlobal.classList.add('hidden');
+                } else {
+                    localStorage.removeItem('icu_weight');
+                }
                 if(state.selectedDrug) updateCalculatorState();
+                updateGlobalWarning();
             });
 
             elSearch.addEventListener('input', (e) => {
@@ -458,6 +628,23 @@
 
             iDosis.addEventListener('input', () => calculate('dosis'));
             iRitmo.addEventListener('input', () => calculate('ritmo'));
+
+            // Autoguardado de última consulta (se abre al iniciar)
+            const lastDrug = localStorage.getItem('last_drug_index');
+            const lastPres = localStorage.getItem('last_pres_index');
+            if (lastDrug !== null && farmacos[parseInt(lastDrug)]) {
+                state.selectedDrug = farmacos[parseInt(lastDrug)];
+                state.presIndex = parseInt(lastPres) || 0;
+                // No abrimos modal automáticamente, solo restauramos por si acaso
+            }
+        }
+
+        function updateGlobalWarning() {
+            if (!state.weight) {
+                elWarningGlobal.classList.remove('hidden');
+            } else {
+                elWarningGlobal.classList.add('hidden');
+            }
         }
 
         function renderFilters() {
@@ -506,7 +693,6 @@
             `}).join('');
         }
 
-        // --- Lógica Modal y Calculadora ---
         function openDrug(index) {
             const displayedDrugs = farmacos.filter(f => {
                 const matchCat = state.category === 'Todos' || f.categoria === state.category;
@@ -518,7 +704,11 @@
             state.selectedDrug = drug;
             state.presIndex = 0;
 
-            mTitle.textContent = drug.nombre;
+            // Guardar última consulta
+            localStorage.setItem('last_drug_index', farmacos.indexOf(drug));
+            localStorage.setItem('last_pres_index', 0);
+
+            mTitle.innerHTML = `${drug.nombre} <button id="fav-star" class="text-lg ml-1 focus:outline-none ${state.favorites.includes(drug.nombre) ? 'text-yellow-400' : 'text-gray-500'} hover:text-yellow-400 transition-colors" onclick="event.stopPropagation(); toggleFavorite('${drug.nombre}')">${state.favorites.includes(drug.nombre) ? '⭐' : '☆'}</button>`;
             mIcon.textContent = drug.icono;
             mCat.textContent = drug.categoria;
             
@@ -540,6 +730,7 @@
             iDosis.value = '';
             iRitmo.value = '';
             updateSafetyUI(null);
+            safetyPercent.textContent = '--';
 
             elModal.classList.remove('pointer-events-none', 'translate-y-full', 'opacity-0');
         }
@@ -562,12 +753,30 @@
             `).join('');
         }
 
+        // --- Deshacer presentación ---
+        let previousPresIndex = 0;
         function setPres(index) {
+            previousPresIndex = state.presIndex;
             state.presIndex = index;
             renderTabs();
             updateCalculatorState();
             if(iDosis.value) calculate('dosis');
             else if(iRitmo.value) calculate('ritmo');
+            localStorage.setItem('last_pres_index', index);
+            if (previousPresIndex !== index) {
+                showToast(`Presentación cambiada. ¿Deshacer?`, 'undo');
+                const toast = document.getElementById('toast-container').lastChild;
+                if (toast) {
+                    toast.addEventListener('click', () => {
+                        state.presIndex = previousPresIndex;
+                        renderTabs();
+                        updateCalculatorState();
+                        if(iDosis.value) calculate('dosis');
+                        else if(iRitmo.value) calculate('ritmo');
+                        toast.remove();
+                    });
+                }
+            }
         }
 
         function updateCalculatorState() {
@@ -610,7 +819,6 @@
             }
         }
 
-        // --- Cálculos ---
         function calculate(source) {
             const pres = state.selectedDrug.presentaciones[state.presIndex];
             const w = state.weight || 1;
@@ -660,6 +868,7 @@
             if (dosis === null) {
                 safetyBar.style.width = '0%';
                 safetyMsg.textContent = '';
+                safetyPercent.textContent = '--';
                 iDosis.parentElement.parentElement.classList.remove('border-green-500', 'border-yellow-500', 'border-red-500');
                 return;
             }
@@ -667,12 +876,14 @@
             const inputParent = iDosis.parentElement.parentElement;
             inputParent.classList.remove('border-green-500', 'border-yellow-500', 'border-red-500');
 
+            let pctRange = 0;
             if (dosis > pres.hardMax) {
                 safetyBar.className = 'h-full transition-all duration-300 bg-red-500';
                 safetyBar.style.width = '100%';
                 safetyMsg.className = 'text-center text-sm font-bold mt-2 text-red-500 animate-pulse';
                 safetyMsg.textContent = '🛑 Dosis Tóxica / Muy Alta';
                 inputParent.classList.add('border-red-500');
+                pctRange = 100;
             } else if (dosis > pres.softMax) {
                 safetyBar.className = 'h-full transition-all duration-300 bg-yellow-500';
                 const pct = 75 + ((dosis - pres.softMax) / (pres.hardMax - pres.softMax)) * 25;
@@ -680,11 +891,13 @@
                 safetyMsg.className = 'text-center text-sm font-semibold mt-2 text-yellow-500';
                 safetyMsg.textContent = '⚠️ Dosis Alta (Precaución)';
                 inputParent.classList.add('border-yellow-500');
+                pctRange = Math.min(pct, 100);
             } else if (dosis < pres.dosisMin) {
                 safetyBar.className = 'h-full transition-all duration-300 bg-gray-500';
                 safetyBar.style.width = '15%';
                 safetyMsg.className = 'text-center text-sm font-medium mt-2 text-gray-500';
                 safetyMsg.textContent = 'Dosis Infraterapéutica';
+                pctRange = 15;
             } else {
                 safetyBar.className = 'h-full transition-all duration-300 bg-green-500';
                 const pct = 15 + ((dosis - pres.dosisMin) / (pres.softMax - pres.dosisMin)) * 60;
@@ -692,10 +905,11 @@
                 safetyMsg.className = 'text-center text-sm font-medium mt-2 text-green-400';
                 safetyMsg.textContent = '✅ Dosis Segura / Habitual';
                 inputParent.classList.add('border-green-500');
+                pctRange = pct;
             }
+            safetyPercent.textContent = `${Math.round(pctRange)}%`;
         }
 
-        // Arranque
         init();
     </script>
 </body>
