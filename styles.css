@@ -1438,18 +1438,23 @@ body, .app-header, .sidebar, #panel-detalle, .farm-card,
   gap: 6px;
 }
 .btn-copiar {
-  background: none;
-  border: none;
-  color: var(--text-3);
+  background: var(--cyan-dim);
+  border: 1px solid var(--cyan);
+  color: var(--cyan);
   cursor: pointer;
-  padding: 4px;
-  border-radius: 5px;
+  padding: 5px 8px;
+  border-radius: 6px;
   display: flex;
   align-items: center;
-  transition: color 0.15s, background 0.15s;
+  gap: 4px;
+  font-size: 10px;
+  font-family: var(--font);
+  font-weight: 600;
+  transition: all 0.15s;
   flex-shrink: 0;
+  letter-spacing: 0.02em;
 }
-.btn-copiar:hover { color: var(--cyan); background: var(--cyan-dim); }
+.btn-copiar:hover { background: var(--cyan); color: var(--bg); }
 
 /* ── Toast ──────────────────────────────────────────────── */
 .toast-container {

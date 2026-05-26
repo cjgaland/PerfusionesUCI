@@ -778,8 +778,9 @@ function mostrarResultado(box, pres, mlH, dosis, alertaDosis) {
         <span class="res-label">Ritmo de bomba</span>
         <div class="res-valor-wrap">
           <span class="res-valor">${mlHTexto}</span>
-          <button class="btn-copiar" onclick="copiarResultado('${mlHTexto} ml/h')" title="Copiar">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><rect x="9" y="9" width="13" height="13" rx="2" stroke="currentColor" stroke-width="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" stroke="currentColor" stroke-width="2"/></svg>
+          <button class="btn-copiar" onclick="copiarResultado('${mlHTexto} ml/h')" title="Copiar ml/h">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><rect x="9" y="9" width="13" height="13" rx="2" stroke="currentColor" stroke-width="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" stroke="currentColor" stroke-width="2"/></svg>
+            Copiar
           </button>
         </div>
         <span class="res-unit">ml / h</span>
