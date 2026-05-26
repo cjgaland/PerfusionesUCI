@@ -94,6 +94,11 @@ document.addEventListener("DOMContentLoaded", () => {
   // Registrar Service Worker (PWA)
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker.register("sw.js").catch(() => {});
+    // Cuando un nuevo SW toma el control, recargar para obtener
+    // los ficheros actualizados (sin intervención del usuario)
+    navigator.serviceWorker.addEventListener("controllerchange", () => {
+      window.location.reload();
+    });
   }
 });
 
@@ -717,33 +722,49 @@ function mostrarResultado(box, pres, mlH, dosis, alertaDosis) {
       </div>`;
   }
 
-  // Calcular barra de seguridad
+  // Calcular slider de seguridad
   const softMax   = pres.softMax || pres.dosisMax;
   const hardMax   = pres.hardMax;
   const dosisMin  = pres.dosisMin;
   let safetyHtml  = "";
 
   if (softMax || dosisMin) {
-    const barMax = hardMax || (softMax * 1.4) || (dosisMin * 3);
-    const pct    = Math.min((dosis / barMax) * 100, 100);
-    const etiquetas = { ok: "✓ RANGO", alto: "ALTO", bajo: "BAJO", peligro: "TÓXICO" };
-    const etiq   = etiquetas[alertaDosis || "ok"];
-    const zonaMin = dosisMin ? formatNum(dosisMin, 2) : "0";
-    const zonaMax = softMax  ? formatNum(softMax, 2)  : "";
-    const zonaHard = hardMax ? ` · máx ${formatNum(hardMax, 2)}` : "";
+    const sliderMax = hardMax ? hardMax * 1.2 : (softMax ? softMax * 1.5 : dosis * 3);
+    const safePct   = softMax ? (softMax / sliderMax) * 100 : null;
+    const hardPct   = hardMax ? (hardMax / sliderMax) * 100 : null;
+    const sliderVal = Math.min(dosis, sliderMax);
+    const range     = sliderMax;
+    const step      = range <= 2 ? 0.01 : range <= 20 ? 0.1 : 1;
+
+    let gradient;
+    if (safePct && hardPct) {
+      gradient = `linear-gradient(to right, var(--green) 0%, var(--green) ${safePct.toFixed(1)}%, var(--amber) ${safePct.toFixed(1)}%, var(--amber) ${hardPct.toFixed(1)}%, var(--red) ${hardPct.toFixed(1)}%, var(--red) 100%)`;
+    } else if (safePct) {
+      gradient = `linear-gradient(to right, var(--green) 0%, var(--green) ${safePct.toFixed(1)}%, var(--amber) ${safePct.toFixed(1)}%, var(--amber) 100%)`;
+    } else {
+      gradient = `var(--green)`;
+    }
+
+    const etiquetas = { ok: "✓ En rango", alto: "▲ Alto", bajo: "▼ Bajo", peligro: "⚠ Tóxico" };
+    const etiq      = etiquetas[alertaDosis || "ok"];
 
     safetyHtml = `
       <div class="res-safety-wrap">
         <div class="res-safety-header">
-          <span class="res-safety-titulo">Seguridad de dosis</span>
+          <span class="res-safety-titulo">Ajuste de dosis · ${pres.unidad}</span>
           <span class="res-safety-etiqueta res-safety-etiqueta--${alertaDosis || "ok"}">${etiq}</span>
         </div>
-        <div class="res-safety-bar">
-          <div class="res-safety-fill res-safety-fill--${alertaDosis || "ok"}" style="width:${pct}%"></div>
-        </div>
+        <input type="range" class="safety-slider"
+          min="0" max="${sliderMax.toFixed(3)}"
+          value="${sliderVal.toFixed(3)}"
+          step="${step}"
+          style="--slider-gradient: ${gradient}"
+          oninput="onSafetySliderInput(this)"
+          onchange="onSafetySlider(this)">
         <div class="res-safety-zones">
-          <span>${zonaMin}</span>
-          ${zonaMax ? `<span>${zonaMax}${zonaHard}</span>` : ""}
+          <span>0</span>
+          ${softMax ? `<span>${formatNum(softMax, 2)}</span>` : ""}
+          ${hardMax ? `<span>${formatNum(hardMax, 2)}</span>` : ""}
         </div>
       </div>`;
   }
@@ -817,6 +838,32 @@ function formatNum(n, decimals = 2) {
     maximumFractionDigits: decimals,
     minimumFractionDigits: 0
   }).format(n);
+}
+
+// ── Slider de seguridad de dosis ──────────────────────────
+function onSafetySliderInput(slider) {
+  // Actualiza el input de dosis en tiempo real mientras se arrastra
+  const val      = parseFloat(slider.value);
+  const step     = parseFloat(slider.step);
+  const decimals = step < 0.05 ? 2 : step < 1 ? 1 : 0;
+  const rounded  = parseFloat(val.toFixed(decimals));
+  document.getElementById("valor-input").value = String(rounded).replace(".", ",");
+}
+
+function onSafetySlider(slider) {
+  // Al soltar: actualiza el input y recalcula
+  const val      = parseFloat(slider.value);
+  const step     = parseFloat(slider.step);
+  const decimals = step < 0.05 ? 2 : step < 1 ? 1 : 0;
+  const rounded  = parseFloat(val.toFixed(decimals));
+  document.getElementById("valor-input").value = String(rounded).replace(".", ",");
+  // Asegurarse de que estamos en modo dosis→ml/h
+  if (modoCalculo !== "dosis") {
+    modoCalculo = "dosis";
+    const pres = farmSeleccionado && farmSeleccionado.presentaciones[presIndex];
+    if (pres) actualizarModoUI(pres);
+  }
+  calcular();
 }
 
 // ── Copiar resultado ───────────────────────────────────────
