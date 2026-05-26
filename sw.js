@@ -1,9 +1,9 @@
 // ============================================================
-//  sw.js — Service Worker · Perfusiones UCI V5
+//  sw.js — Service Worker · Perfusiones UCI V6
 //  Incrementar CACHE_NAME para forzar actualización en usuarios
 // ============================================================
 
-const CACHE_NAME = "perfusiones-v5";
+const CACHE_NAME = "perfusiones-v6";
 
 const ASSETS = [
   "./index.html",

@@ -1232,16 +1232,16 @@ body, .app-header, .sidebar, #panel-detalle, .farm-card,
   /* Layout columna única */
   .app-content {
     grid-template-columns: 1fr;
-    height: auto;
-    overflow: visible;
+    grid-template-rows: 1fr auto;
+    height: calc(100vh - var(--header-h));
+    overflow: hidden;
   }
 
-  /* Sidebar reducida */
+  /* Sidebar ocupa la mayor parte de la pantalla */
   .sidebar {
     border-right: none;
     border-bottom: 1px solid var(--border);
-    max-height: 280px;
-    height: auto;
+    max-height: none;
     overflow: hidden;
     display: flex;
     flex-direction: column;
@@ -1287,11 +1287,12 @@ body, .app-header, .sidebar, #panel-detalle, .farm-card,
   .farm-modos { margin-top: 3px; }
   .farm-pres-n { margin-left: auto; }
 
-  /* Empty state */
-  .main-area { min-height: 80px; display: flex; align-items: center; justify-content: center; }
-  .empty-state { padding: 20px; gap: 8px; }
-  .empty-title { font-size: 14px; }
-  .empty-sub   { font-size: 12px; }
+  /* Empty state compacto en móvil */
+  .main-area { overflow: hidden; }
+  .empty-state { padding: 10px 16px 14px; gap: 3px; align-items: flex-start; justify-content: center; }
+  .empty-icono { display: none; }
+  .empty-title { font-size: 11px; font-weight: 600; color: var(--text-3); }
+  .empty-sub   { font-size: 11px; max-width: none; }
 
   /* Panel desde abajo - comienza bajo el header para que botón ✕ sea accesible */
   #panel-detalle {
@@ -1375,22 +1376,51 @@ body, .app-header, .sidebar, #panel-detalle, .farm-card,
 .res-safety-etiqueta--alto    { color: var(--amber); }
 .res-safety-etiqueta--bajo    { color: var(--cyan); }
 .res-safety-etiqueta--peligro { color: var(--hard-stop); }
-.res-safety-bar {
+/* Slider de seguridad */
+.safety-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
   height: 7px;
-  background: var(--bg-4);
   border-radius: 4px;
-  overflow: hidden;
+  outline: none;
+  cursor: pointer;
+  border: none;
+  display: block;
+  background: transparent;
 }
-.res-safety-fill {
-  height: 100%;
+.safety-slider::-webkit-slider-runnable-track {
+  height: 7px;
   border-radius: 4px;
-  transition: width 0.4s cubic-bezier(.4,0,.2,1), background 0.3s;
-  max-width: 100%;
+  background: var(--slider-gradient, var(--bg-4));
 }
-.res-safety-fill--ok      { background: var(--green); }
-.res-safety-fill--alto    { background: var(--amber); }
-.res-safety-fill--bajo    { background: var(--cyan); }
-.res-safety-fill--peligro { background: var(--hard-stop); }
+.safety-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 22px;
+  height: 22px;
+  margin-top: -7.5px;
+  border-radius: 50%;
+  background: var(--text-1);
+  border: 2.5px solid var(--bg-2);
+  box-shadow: 0 1px 6px rgba(0,0,0,0.4);
+  cursor: grab;
+  transition: transform 0.1s;
+}
+.safety-slider::-webkit-slider-thumb:active { transform: scale(1.2); cursor: grabbing; }
+.safety-slider::-moz-range-track {
+  height: 7px;
+  border-radius: 4px;
+  background: var(--slider-gradient, var(--bg-4));
+}
+.safety-slider::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--text-1);
+  border: 2.5px solid var(--bg-2);
+  box-shadow: 0 1px 6px rgba(0,0,0,0.4);
+  cursor: grab;
+}
 .res-safety-zones {
   display: flex;
   justify-content: space-between;
@@ -1449,3 +1479,31 @@ body, .app-header, .sidebar, #panel-detalle, .farm-card,
 .toast--ok { border-color: var(--green); color: var(--green); }
 @keyframes toastIn  { from { opacity:0; transform: translateY(8px); } to { opacity:1; transform: translateY(0); } }
 @keyframes toastOut { from { opacity:1; } to { opacity:0; } }
+
+/* ── Disclaimer ─────────────────────────────────────────── */
+.disclaimer {
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+  margin-top: 10px;
+  padding: 10px 14px;
+  background: var(--bg-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text-3);
+  font-size: 11px;
+  line-height: 1.5;
+  max-width: 360px;
+  text-align: left;
+}
+.disclaimer svg { flex-shrink: 0; margin-top: 1px; color: var(--amber); }
+/* En móvil, el disclaimer ocupa todo el ancho */
+@media (max-width: 640px) {
+  .disclaimer {
+    max-width: none;
+    margin-top: 6px;
+    font-size: 10.5px;
+    padding: 8px 12px;
+    border-radius: 8px;
+  }
+}
