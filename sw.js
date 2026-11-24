@@ -5,7 +5,7 @@
 //  inmediato sin tener que limpiar caché manualmente.
 // ============================================================
 
-const CACHE_NAME = "perfusiones-v7";
+const CACHE_NAME = "perfusiones-v9";
 
 const ASSETS = [
   "./index.html",
@@ -15,7 +15,11 @@ const ASSETS = [
   "./manifest.json",
   "./icon-192.svg",
   "./icon-512.svg",
-  "./icon-180.svg"
+  "./icon-180.svg",
+  "./icon-180.png",
+  "./icon-192.png",
+  "./icon-512.png",
+  "./icon-512-maskable.png"
 ];
 
 self.addEventListener("install", event => {

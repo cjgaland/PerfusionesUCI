@@ -1838,7 +1838,7 @@ const farmacos = [
         label: "1600 mg / 500 ml Dx5%",
         dosis_mg: 1600, dilucion_ml: 500, suero: "Dx5%",
         concMgMl: 1600 / 500,                 // 3,2 mg/ml
-        dosisRange: "1 mg/kg/h",
+        dosisRange: "1 – 1,5 mg/kg/h",
         dosisMin: 1, softMax: 1.5, hardMax: 2.0,
         unidad: "mg/kg/h", calcTipo: "mg_kg_h"
       }

@@ -49,6 +49,7 @@ let categoriaFiltro  = "Todos";
 let clinicaTab       = "indicaciones";
 let clinicaAbierta   = false;
 let favoritos        = new Set(JSON.parse(localStorage.getItem("perfusiones-favoritos") || "[]"));
+let calcTimer        = null;
 
 // ── Inicialización ─────────────────────────────────────────
 document.addEventListener("DOMContentLoaded", () => {
@@ -259,6 +260,8 @@ function bindPeso() {
       if (farmSeleccionado) {
         const pres = farmSeleccionado.presentaciones[presIndex];
         const necesitaPeso = ["mcg_kg_min", "mcg_kg_h", "mg_kg_h"].includes(pres.calcTipo);
+        document.getElementById("aviso-peso").style.display =
+          (necesitaPeso && !pesoActual && modoAdmin !== "puntual") ? "flex" : "none";
 
         if (modoAdmin === "puntual") {
           renderPuntualBox(farmSeleccionado);
@@ -270,8 +273,6 @@ function bindPeso() {
             if (inpVal.value && parseFloat(inpVal.value.replace(",", ".")) > 0) calcular();
           }
         } else {
-          document.getElementById("aviso-peso").style.display =
-            (necesitaPeso && !pesoActual) ? "flex" : "none";
           const inpVal = document.getElementById("valor-input");
           if (inpVal.value && parseFloat(inpVal.value.replace(",", ".")) > 0) {
             calcular();
@@ -462,7 +463,8 @@ function precargarYCalcular(pres) {
   const inputVal = document.getElementById("valor-input");
   if (pres.dosisMin && pres.dosisMin > 0) {
     inputVal.value = pres.dosisMin;
-    setTimeout(() => calcular(), 0);
+    clearTimeout(calcTimer);
+    calcTimer = setTimeout(() => calcular(), 0);
   } else {
     inputVal.value = "";
     limpiarCalc();
