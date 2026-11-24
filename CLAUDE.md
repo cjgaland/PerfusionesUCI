@@ -20,7 +20,7 @@ Léelo completo antes de proponer cualquier cambio.
 
 ### Estado actual (verificado contra el código el 24/11/2026)
 
-- **Versión**: el código no declara un número de versión de la app. Las cabeceras de `app.js`, `farmacos.js` y `styles.css` dicen «V3»; el Service Worker (`sw.js`) dice «V7» y su caché se llama `perfusiones-v9` (`CACHE_NAME`). **Al cambiar cualquier archivo estático hay que subir `CACHE_NAME`** (p. ej. `perfusiones-v10`); no hay otra versión visible en la interfaz.
+- **Versión**: **v3.1** (24/11/2026), visible en la cabecera junto al título (`.header-version` en `index.html`, con la fecha en el `title`). La caché del Service Worker lleva el mismo número: `CACHE_NAME = "perfusiones-v3.1"`. **Al publicar cualquier cambio hay que subir la versión en los dos sitios a la vez** (p. ej. `v3.2` en `index.html`, texto y `title` con la fecha, y `perfusiones-v3.2` en `sw.js`); si no se cambia `CACHE_NAME`, los dispositivos pueden seguir usando archivos antiguos sin conexión. Las cabeceras de `app.js`, `farmacos.js` y `styles.css` dicen «V3» (versión mayor).
 - **Datos**: 44 fármacos, 50 presentaciones en total y 15 categorías (las categorías se generan solas desde `farmacos.js`).
 - **Pantallas** (una sola página, sin rutas): cabecera (título, peso del paciente, botón de tema claro/oscuro); barra lateral con buscador, chips de categoría (incluye «Favoritos») y lista de fármacos; panel de detalle del fármaco (en escritorio ocupa toda la zona central a la derecha de la lista; en móvil sale desde abajo con un overlay).
 - **Funciones del panel**: selector de modo de administración (`perfusion`, `puntual`, `carga_mantenimiento`) cuando el fármaco tiene más de uno; pestañas de presentación; cálculo «Dosis → ml/h» y «ml/h → Dosis»; resultado con alertas de dosis (tóxica / alta / baja); barra de ajuste de dosis (slider) que recalcula al soltar; botón Copiar (copia el ml/h); tiempo que dura la bolsa; detalles de la dilución (colapsable); información clínica (indicaciones, precauciones, contraindicaciones); tarjetas de dosis de carga y de dosis puntual; favoritos (estrella).
@@ -42,11 +42,12 @@ Perfusiones/
 ├── styles.css      → Todo el CSS: variables, componentes, responsive
 ├── app.js          → Toda la lógica: estado, renderizado, cálculos
 ├── farmacos.js     → Base de datos de fármacos (datos puros, sin lógica)
-├── sw.js           → Service Worker (caché offline, network-first; CACHE_NAME "perfusiones-v9")
+├── sw.js           → Service Worker (caché offline, network-first; CACHE_NAME "perfusiones-v3.1")
 ├── manifest.json   → Manifiesto PWA (usa los PNG y icon-512.svg)
 ├── icon-180.svg, icon-192.svg, icon-512.svg → Iconos fuente (las líneas van en color sólido: un degradado no se pinta en una línea recta vertical u horizontal)
 ├── icon-180.png, icon-192.png, icon-512.png, icon-512-maskable.png → PNG generados desde los SVG (iPhone, Android, favicon); el maskable tiene fondo a sangre y dibujo al 80 %
 ├── README.md       → Descripción breve del repositorio
+├── fonts/          → Inter y JetBrains Mono (woff2 variables, subconjunto latino de Google Fonts) + sus licencias OFL
 ├── .gitignore      → Excluye Backup/, .DS_Store, .claude/settings.local.json y *.xlsx
 ├── PERFUSIONES INTRAVENOSAS (1).xlsx → Hoja de cálculo original (referencia; no la lee el código)
 ├── .claude/        → launch.json (npx serve, puerto 5050) y settings.local.json
@@ -218,7 +219,7 @@ Otros cálculos (transcritos del código): duración de la bolsa = `dilucion_ml 
 4. Si la categoría es nueva, aparecerá automáticamente en los filtros (se genera con `Set`).
 5. Verificar `dosisMin`, `softMax` y `hardMax` contra fichas técnicas o protocolos del servicio.
 6. Definir `modos` (y `carga`/`puntual`/`info` si aplican) y asignar `isoColor`.
-7. Subir `CACHE_NAME` en `sw.js` para que los dispositivos reciban el cambio, y hacer antes una copia de seguridad (sección 8).
+7. Subir la versión (`.header-version` en `index.html` y `CACHE_NAME` en `sw.js`) para que los dispositivos reciban el cambio, y hacer antes una copia de seguridad (sección 8).
 
 ---
 
@@ -264,7 +265,7 @@ La clase `modo-claro` se añade al `<html>` desde JS. El modo se persiste en `lo
 | `--font` | Inter (tipografía principal) |
 | `--mono` | JetBrains Mono (números, concentraciones, resultados) |
 
-Las dos fuentes se cargan con un `@import` de Google Fonts al principio de `styles.css`: hace falta conexión la primera vez; sin conexión se usa `sans-serif`/`monospace` del sistema (el Service Worker solo cachea respuestas del propio origen).
+Las dos fuentes son locales: `@font-face` al principio de `styles.css` apuntando a `fonts/inter-latin.woff2` (pesos 300–700) y `fonts/jetbrains-mono-latin.woff2` (400–700). Están en la lista `ASSETS` de `sw.js`, así que funcionan sin conexión. Solo incluyen el subconjunto latino (cubre el español); un carácter fuera de ese rango (p. ej. «→») se dibuja con la fuente del sistema.
 
 ### Breakpoints
 
@@ -432,7 +433,7 @@ Vista de impresión con CSS `@media print` que muestre un resumen limpio de todo
 - Verificar que `calcTipo` corresponde a la unidad expresada en `unidad`.
 - Calcular `concUgMl` o `concMgMl` como expresión matemática comentada, nunca como valor literal.
 - El `dosisRange` (string) debe ser consistente con `dosisMin`/`softMax` (números); `hardMax` es el límite de «dosis tóxica».
-- Subir `CACHE_NAME` en `sw.js` tras cualquier cambio en los archivos de la app.
+- Subir la versión (`.header-version` en `index.html` y `CACHE_NAME` en `sw.js`, siempre iguales) tras cualquier cambio en los archivos de la app.
 - Insertar en orden alfabético en el array `farmacos`.
 - Si se crea una nueva categoría, verificar que el icono tiene coherencia visual con el resto.
 

@@ -1,11 +1,12 @@
 // ============================================================
-//  sw.js — Service Worker · Perfusiones UCI V7
+//  sw.js — Service Worker · Perfusiones UCI
 //  Estrategia network-first: siempre intenta la red, usa caché
 //  como fallback offline. Así los despliegues se reciben de
 //  inmediato sin tener que limpiar caché manualmente.
 // ============================================================
 
-const CACHE_NAME = "perfusiones-v9";
+// Debe coincidir con la versión visible en index.html (.header-version)
+const CACHE_NAME = "perfusiones-v3.1";
 
 const ASSETS = [
   "./index.html",
@@ -19,7 +20,9 @@ const ASSETS = [
   "./icon-180.png",
   "./icon-192.png",
   "./icon-512.png",
-  "./icon-512-maskable.png"
+  "./icon-512-maskable.png",
+  "./fonts/inter-latin.woff2",
+  "./fonts/jetbrains-mono-latin.woff2"
 ];
 
 self.addEventListener("install", event => {
