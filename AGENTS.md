@@ -455,7 +455,7 @@ Vista de impresión con CSS `@media print` que muestre un resumen limpio de todo
 
 ## 8. Copias de seguridad locales
 
-**Repositorio git** desde el 24/11/2026: remoto `origin` = `cjgaland/PerfusionesUCI` (público, publicado con GitHub Pages, rama `main`). El remoto `privado` = `cjgaland/perfusiones-uci` es un duplicado creado el mismo día. `Backup/` está en `.gitignore`. Cada vez que se haga commit + push, hacer también una copia en `Backup/` en el mismo paso. El Excel original y `.claude/settings.local.json` no se suben (el Excel contiene un correo y metadatos de autores).
+**Repositorio git** desde el 24/11/2026: remoto `origin` = `cjgaland/PerfusionesUCI` (público, publicado con GitHub Pages, rama `main`). Es el enlace que usan los compañeros: no renombrarlo ni borrarlo. (Un duplicado privado, `perfusiones-uci`, se creó y se borró el 24/11/2026.) `Backup/` está en `.gitignore`. Cada vez que se haga commit + push, hacer también una copia en `Backup/` en el mismo paso. El Excel original y `.claude/settings.local.json` no se suben (el Excel contiene un correo y metadatos de autores).
 
 - Carpeta `Backup/` en la raíz del proyecto. Cada copia es el proyecto completo en `Backup/Copia_Seguridad_Perfusiones_DD_MM_YYYY-HH_MM`.
 - **Se conservan solo las 5 más recientes**: al crear una nueva se borra la más antigua.
